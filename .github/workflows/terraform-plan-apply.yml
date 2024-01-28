@@ -74,6 +74,10 @@ jobs:
           terraform fmt -check -recursive
           terraform validate
 
+      - name: Set Permissions
+        run: |
+          chmod -R 755 .git
+
       - name: Download Terraform Plan
         uses: actions/download-artifact@v2
         with:
