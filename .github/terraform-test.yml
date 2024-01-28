@@ -1,0 +1,31 @@
+name: Terraform Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Terraform
+        run: |
+          TERRAFORM_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
+          wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+          unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform --version
+
+      - name: Initialize Terraform
+        run: |
+          terraform init
+
+      - name: Validate Terraform Files
+        run: |
+          terraform fmt -check -recursive
+          terraform validate
