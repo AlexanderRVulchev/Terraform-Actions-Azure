@@ -12,63 +12,21 @@ env:
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
 jobs:
-  terraform-plan:
-    name: 'Terraform'
-    runs-on: ubuntu-latest 
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-        
-      - name: Log in to Azure
-        uses: Azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-      - name: Install Terraform
-        run: |
-          TERRAFORM_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
-          wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-          unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-          sudo mv terraform /usr/local/bin/
-          terraform --version
-
-      - name: Initialize Terraform
-        run: |
-          terraform init
-
-      - name: Validate Terraform Files
-        run: |
-          terraform fmt -check -recursive
-          terraform validate
-
-      - name: Save Terraform Plan as Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: terraform-plan
-          path: .
-
   terraform-apply:
     name: 'Terraform-Apply'
-    runs-on: ubuntu-latest 
-    needs: terraform-plan
+    runs-on: ubuntu-latest     
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2    
+        uses: actions/checkout@v3    
 
-      - name: Log in to Azure
-        uses: Azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#      - name: Log in to Azure
+#        uses: Azure/login@v1
+#        with:
+#          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Install Terraform
-        run: |
-          TERRAFORM_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
-          wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-          unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-          sudo mv terraform /usr/local/bin/
-          terraform --version    
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
 
       - name: Initialize Terraform
         run: |
@@ -77,20 +35,7 @@ jobs:
       - name: Validate Terraform Files
         run: |
           terraform fmt -check -recursive
-          terraform validate
-
-      - name: Set Permissions
-        run: |
-          chmod -R 755 .git
-          
-      - name: Generate Terraform Plan
-        run: terraform plan -out=terraform.tfplan
-  
-#      - name: Download Terraform Plan
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: terraform-plan
-#          path: .
+          terraform validate  
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve terraform.tfplan
+        run: terraform apply -auto-approve -input=false
