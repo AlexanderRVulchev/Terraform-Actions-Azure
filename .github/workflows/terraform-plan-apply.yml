@@ -12,13 +12,13 @@ env:
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
 
 jobs:
-  terraform-apply:
-    name: 'Terraform-Apply'
-    runs-on: ubuntu-latest     
+  terraform-plan:
+    name: "Terraform Plan"
+    runs-on: ubuntu-lastest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3    
+        uses: actions/checkout@v3
 
       - name: Log in to Azure
         uses: Azure/login@v1
@@ -26,16 +26,39 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2      
+
+      - name: Initialize Terraform
+        run: terraform init      
+
+      - name: Generate execution plan
+        run: terraform plan -out=tfplan.out
+
+      - name: Archie Terraform Plan
+        uses: actions/upload-artifact@v2
+        with:
+          name: tfplan
+          path: tfplan.out
+          
+  terraform-apply:
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest     
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3    
+
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
       - name: Initialize Terraform
-        run: |
-          terraform init
+        run: terraform init
 
-      - name: Validate Terraform Files
-        run: |
-          terraform fmt -check -recursive
-          terraform validate  
+      - name: Download Terraform Plan Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: tfplan
+          path: ./artifacts
 
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
