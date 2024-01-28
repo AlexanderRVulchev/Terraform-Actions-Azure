@@ -34,11 +34,11 @@ jobs:
       - name: Generate execution plan
         run: terraform plan -out=tfplan.out
 
-      - name: Archie Terraform Plan
-        uses: actions/upload-artifact@v2
-        with:
-          name: tfplan
-          path: ./artifacts
+#      - name: Archie Terraform Plan
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: tfplan
+#          path: ./artifacts
           
   terraform-apply:
     name: 'Terraform Apply'
@@ -55,11 +55,11 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
 
-      - name: Download Terraform Plan Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: tfplan
-          path: ./artifacts
+ #     - name: Download Terraform Plan Artifact
+ #       uses: actions/download-artifact@v2
+ #       with:
+ #         name: tfplan
+ #         path: ./artifacts
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
