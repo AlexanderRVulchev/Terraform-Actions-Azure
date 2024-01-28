@@ -31,8 +31,8 @@ jobs:
       - name: Initialize Terraform
         run: terraform init      
 
-      - name: Generate execution plan
-        run: terraform plan -out=tfplan.out
+#      - name: Generate execution plan
+#        run: terraform plan -out=tfplan.out
 
 #      - name: Archie Terraform Plan
 #        uses: actions/upload-artifact@v2
