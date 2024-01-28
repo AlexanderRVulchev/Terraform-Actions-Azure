@@ -13,7 +13,7 @@ env:
 
 jobs:
   terraform-plan:
-    name: "Terraform Plan"
+    name: 'Terraform Plan'
     runs-on: ubuntu-lastest
 
     steps:
