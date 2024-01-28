@@ -74,11 +74,11 @@ jobs:
           terraform fmt -check -recursive
           terraform validate
 
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v2
-        with:
-          name: terraform-plan
-          path: .
+#      - name: Download Terraform Plan
+#        uses: actions/download-artifact@v2
+#        with:
+#          name: terraform-plan
+#          path: .
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
