@@ -77,7 +77,10 @@ jobs:
       - name: Set Permissions
         run: |
           chmod -R 755 .git
-
+          
+      - name: Generate Terraform Plan
+        run: terraform plan -out=terraform.tfplan
+  
       - name: Download Terraform Plan
         uses: actions/download-artifact@v2
         with:
